@@ -1,0 +1,29 @@
+{
+  "model": "Qwen/Qwen3-4B",
+  "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+  "protocol": "untrained-on-task demo; non-thinking; batch=1",
+  "seed": 42,
+  "settings": {
+    "do_sample": true,
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_new_tokens": 96
+  },
+  "torch": "2.11.0+cu128",
+  "transformers": "5.24.0",
+  "cases_sha256": "447c3459a4fe98b4cc36f6221e0c8e92ca1ecafe9d77bffa6ee87c2fa29c03ee",
+  "peak_allocated_GiB": 7.54,
+  "generation_seconds": [
+    2.496,
+    0.606,
+    0.553
+  ],
+  "score": {
+    "total": 3,
+    "name_correct": 2,
+    "exact_correct": 2,
+    "exact_rate": 0.6666666666666666,
+    "missed_help_closed": 0
+  }
+}
