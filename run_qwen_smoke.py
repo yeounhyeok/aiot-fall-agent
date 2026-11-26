@@ -13,7 +13,9 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     torch.manual_seed(42)
     tok = AutoTokenizer.from_pretrained(str(snapshot), local_files_only=True)
-    model = AutoModelForCausalLM.from_pretrained(str(snapshot), local_files_only=True, dtype=torch.bfloat16, device_map={'': 'cuda:0'}).eval()
+    model_id = snapshot.parents[1].name.removeprefix('models--').replace('--','/')
+    loader = transformers.Qwen3_5ForConditionalGeneration if model_id == 'Qwen/Qwen3.5-2B' else AutoModelForCausalLM
+    model = loader.from_pretrained(str(snapshot), local_files_only=True, dtype=torch.bfloat16, device_map={'': 'cuda:0'}).eval()
     rules = ('한국어 낙상 확인 장치의 오프라인 시뮬레이션입니다. 센서와 대화를 종합해 다음 호출 1개를 JSON 객체로만 출력하세요. '
              '허용 함수/인자: raise_alert(reason="help_requested"), ask_checkin(reason="unclear_reply"), close_event(reason="false_alarm"). '
              '출력 형식: {"name":"함수명","arguments":{"reason":"사유"}}. 설명이나 코드 펜스는 출력하지 마세요.')
@@ -28,7 +30,7 @@ def main():
             try: call = json.loads(raw)
             except ValueError: call = None
             p={'id':c['id'],'call':call,'raw':raw};pred.append(p);f.write(json.dumps(p,ensure_ascii=False)+'\n');f.flush()
-    report = dict(model='Qwen/Qwen3-4B', revision=snapshot.name, protocol='untrained-on-task demo; non-thinking; batch=1', seed=42, settings=settings, torch=torch.__version__,transformers=transformers.__version__, cases_sha256=hashlib.sha256(cases_path.read_bytes()).hexdigest(), peak_allocated_GiB=round(torch.cuda.max_memory_allocated()/2**30,2),generation_seconds=times,score=score(cases,pred))
+    report = dict(model=model_id, revision=snapshot.name, protocol='untrained-on-task demo; non-thinking; batch=1', seed=42, settings=settings, torch=torch.__version__,transformers=transformers.__version__, cases_sha256=hashlib.sha256(cases_path.read_bytes()).hexdigest(), peak_allocated_GiB=round(torch.cuda.max_memory_allocated()/2**30,2),generation_seconds=times,score=score(cases,pred))
     (out/'summary.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n');print(json.dumps(report))
 
 if __name__=='__main__': main()
