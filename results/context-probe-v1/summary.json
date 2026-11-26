@@ -1,0 +1,72 @@
+{
+  "model": "Qwen/Qwen3.5-2B",
+  "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+  "host": "vi005",
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+  "dtype": "BF16",
+  "torch": "2.11.0+cu128",
+  "transformers": "5.24.0",
+  "settings": {
+    "do_sample": true,
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "max_new_tokens": 1024
+  },
+  "seed": "42+case_index",
+  "cases_sha256": "95ccf57a193a5f58c1df7caf0e5badb5dd153b1eac1917c7266f5d7d6a847341",
+  "stats": {
+    "off": {
+      "total": 12,
+      "name_correct": 4,
+      "exact_correct": 0,
+      "exact_rate": 0.0,
+      "missed_help_closed": 2,
+      "pairs_both": 0,
+      "median_seconds": 1.404,
+      "median_tokens": 56.5,
+      "cap_hits": 0,
+      "invalid": 0,
+      "wrong": [
+        "p1a",
+        "p1b",
+        "p2a",
+        "p2b",
+        "p3a",
+        "p3b",
+        "p4a",
+        "p4b",
+        "p5a",
+        "p5b",
+        "p6a",
+        "p6b"
+      ]
+    },
+    "on": {
+      "total": 12,
+      "name_correct": 0,
+      "exact_correct": 0,
+      "exact_rate": 0.0,
+      "missed_help_closed": 0,
+      "pairs_both": 0,
+      "median_seconds": 21.298000000000002,
+      "median_tokens": 1024.0,
+      "cap_hits": 12,
+      "invalid": 12,
+      "wrong": [
+        "p1a",
+        "p1b",
+        "p2a",
+        "p2b",
+        "p3a",
+        "p3b",
+        "p4a",
+        "p4b",
+        "p5a",
+        "p5b",
+        "p6a",
+        "p6b"
+      ]
+    }
+  }
+}
