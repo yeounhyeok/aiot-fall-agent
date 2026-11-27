@@ -4,12 +4,18 @@
 
 ## 먼저 보기
 
-- [Colab에서 노트북 열기](https://colab.research.google.com/github/yeounhyeok/aiot-fall-llm-harness/blob/main/notebooks/fall_dialogue_sft.ipynb) · [노트북 파일](notebooks/fall_dialogue_sft.ipynb) — 기본 모드는 CPU에서 자료 해시와 분할을 확인하고 기존 평가 결과를 표시합니다. 비공개 GitHub 접근 권한이 없으면 노트북 파일을 별도로 받아 Colab에 업로드하세요.
+- [Colab에서 노트북 열기](https://colab.research.google.com/github/yeounhyeok/aiot-fall-agent/blob/main/notebooks/fall_dialogue_sft.ipynb) · [노트북 파일](notebooks/fall_dialogue_sft.ipynb) — 기본 모드는 CPU에서 자료 해시와 분할을 확인하고 기존 평가 결과를 표시합니다.
 - [모델: 최종 LoRA + 중간 체크포인트 5개](https://huggingface.co/yeopeter1031/aiot-fall-qwen3.5-2b-lora-r1/tree/acd4d0a750731a600386d27c3969deb789dc6f1e) — 루트는 평가에 사용한 step 592입니다. 단독 모델이 아니므로 같은 저장소의 카드에 명시된 Qwen 원본과 함께 사용합니다.
 - [티처 입력·출력, 선별 이력, 실제 SFT 분할](https://huggingface.co/datasets/yeopeter1031/aiot-fall-dialogue-teacher-10k-r1/tree/9082fca9a954148bba5deeee6cdb459b457414b2) — 학습에는 `sft/train.jsonl`만 사용합니다. 후보 보관 파일에는 검증 사례도 포함됩니다.
 - [합성 음성 원본과 대화 ID별 매핑](https://huggingface.co/datasets/yeopeter1031/aiot-fall-dialogue-synthetic-audio-r1/tree/0b899dc20412071f3da36cea538b66e5b12ff144) — `row_audio.jsonl`에서 해당 턴의 ZIP과 WAV 경로를 확인할 수 있습니다. 실제 사람이나 낙상 현장의 녹음은 아닙니다.
 
-## 진행 과정
+## 대화 모델의 학습 아키텍처
+
+`센서 상태·이전 질문·STT 전사 → 채팅 템플릿 → Qwen3.5-2B + LoRA → 행동 JSON + EOS`
+
+기본 가중치는 고정하고 언어층의 선형 어텐션, 셀프 어텐션, MLP 투영에 LoRA를 붙였습니다(rank 16, alpha 32, dropout 0.05). 학습 대상은 어댑터의 16,819,200개 파라미터입니다. 질문과 대화 기록의 토큰은 `-100`으로 마스킹해 손실에서 제외합니다. 이렇게 하면 모델은 질문을 재생성하는 대신 관측된 대화로부터 교사의 다음 행동 JSON을 쓰도록 학습합니다. 토큰화·마스킹·옵티마이저 구현은 [학습 노트북](notebooks/fall_dialogue_sft.ipynb)에 있습니다.
+
+## 대화 데이터 생성과 평가
 
 1. **대화와 음성 만들기.** 장치의 질문과 사용자 대본을 만든 뒤 MMS-TTS-kor로 합성했습니다. 깨끗한 음성, 배경 소음, 끝부분 잘림 조건에서 Whisper-base로 전사했습니다. 학생에게 원 대본을 주지 않은 이유는 장치가 실제로 받는 입력이 전사문이기 때문입니다.
 2. **라벨 생성·검토.** GPT-OSS-20B가 관측된 대화만 보고 다음 행동과 근거를 생성했습니다. 별도 블라인드 검토 결과, 함수·인자·후속 질문, 전사문에 근거가 있는지를 검사했습니다. 공유한 교사 라벨 및 TTS→STT 사례는 팀원이 직접 확인했습니다. 최종 1만 건을 사람이 전수 판정했다는 뜻은 아닙니다.
