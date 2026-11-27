@@ -103,6 +103,14 @@
 
 항상 상태 재확인만 고르는 기준선도 444/536(82.8%)입니다. SFT는 이보다 68건을 더 맞혔지만, 직전 질문을 반복해야 하는 19건은 모두 상태 재확인으로 돌렸습니다. 미튜닝 0점은 이 직접 호출 조건에서 지정한 함수 형식을 맞히지 못했다는 뜻입니다. **이 점수는 합성 전사에서의 교사 일치도이지 실사용 낙상 감지 정확도가 아닙니다.** [집계 원본](https://huggingface.co/yeopeter1031/aiot-fall-qwen3.5-2b-lora-r1/resolve/acd4d0a750731a600386d27c3969deb789dc6f1e/evaluation.json)
 
+## Discord 도움 요청 알림
+
+[알림 함수](notifications/discord_alert.py)는 대화 모델의 결정 JSON을 받아 `raise_alert` + `help_requested`이고 `next_prompt`가 `null`일 때만 고정 문구를 보냅니다. 센서 후보·재확인·상황 종료는 전송하지 않습니다. 원음·전사·인용·사용자 정보도 보내지 않습니다. 외부 알림은 선택 사항이며 오프라인에서는 로컬 장치 동작을 우선하세요.
+
+- 장치 실행 환경에 `FALL_AGENT_DISCORD_WEBHOOK_URL`을 비공개로 설정하세요. 실제 URL은 저장소에 넣지 않습니다.
+- 연결 테스트: `python3 notifications/discord_alert.py --test` (실제 채널에 테스트 메시지 1건 전송).
+- 장치 통합: 이벤트가 확정될 때 한 번 `notify_decision(decision)`을 호출하거나, `python3 notifications/discord_alert.py --decision-stdin < decision.json`으로 전달하세요. 반환값 `sent`에는 Discord 메시지 ID가 포함됩니다. `unconfirmed`는 전송 여부가 불명확하므로 자동 재시도하지 않습니다. 이는 채널 알림이며 응급 신고 기능이 아닙니다.
+
 ## 재현 자료 · Hugging Face와 Colab
 
 - [Colab에서 노트북 열기](https://colab.research.google.com/github/yeounhyeok/aiot-fall-agent/blob/main/notebooks/fall_dialogue_sft.ipynb) · [노트북 파일](notebooks/fall_dialogue_sft.ipynb) — 기본 모드는 CPU에서 자료 해시와 분할을 확인하고 기존 평가 결과를 표시합니다.
