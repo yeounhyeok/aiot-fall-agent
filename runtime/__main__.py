@@ -5,12 +5,14 @@ from .controller import monitor
 
 
 def main():
-    p = argparse.ArgumentParser(description='Wired Fall Agent')
+    p = argparse.ArgumentParser(description='Fall Agent (USB / BLE IMU)')
     sub = p.add_subparsers(dest='mode',required=True)
     rp = sub.add_parser('replay',help='offline scripted control-flow demonstration; sends nothing')
     rp.add_argument('scenario', choices=['help','clear','silence'])
     live = sub.add_parser('live')
-    live.add_argument('--port', required=True, help='wired IMU serial port')
+    source = live.add_mutually_exclusive_group(required=True)
+    source.add_argument('--port', help='wired IMU serial port')
+    source.add_argument('--ble-address', help='BLE address of your UNO R4 WiFi')
     live.add_argument('--asr-dir', required=True, type=Path, help='local Whisper-base model directory')
     live.add_argument('--pack', type=Path, default=Path(__file__).resolve().parents[1]/'device_audio'/'wav')
     live.add_argument('--endpoint', default='http://127.0.0.1:8080')
@@ -26,7 +28,12 @@ def main():
     from .dialogue import LocalDialogue
     io = LocalDialogue(pack=args.pack, asr_dir=args.asr_dir, endpoint=args.endpoint, mic=args.mic, speaker=args.speaker)
     io.check()
-    with WiredIMU(port=args.port) as sensor:
+    if args.ble_address:
+        from .ble_imu import BluetoothIMU
+        imu = BluetoothIMU(args.ble_address)
+    else:
+        imu = WiredIMU(port=args.port)
+    with imu as sensor:
         return monitor(sensor,io,one=args.once,max_turns=args.max_turns,alerts=args.discord)
 
 

@@ -103,7 +103,15 @@
 
 항상 상태 재확인만 고르는 기준선도 444/536(82.8%)입니다. SFT는 이보다 68건을 더 맞혔지만, 직전 질문을 반복해야 하는 19건은 모두 상태 재확인으로 돌렸습니다. 미튜닝 0점은 이 직접 호출 조건에서 지정한 함수 형식을 맞히지 못했다는 뜻입니다. **이 점수는 합성 전사에서의 교사 일치도이지 실사용 낙상 감지 정확도가 아닙니다.** [집계 원본](https://huggingface.co/yeopeter1031/aiot-fall-qwen3.5-2b-lora-r1/resolve/acd4d0a750731a600386d27c3969deb789dc6f1e/evaluation.json)
 
-## Jetson에서 유선 에이전트 실행
+## Jetson에서 에이전트 실행: BLE 또는 USB
+
+**착용 모드:** 보조배터리로 구동한 UNO R4 WiFi가 MPU6050의 6축 신호만 BLE로 보냅니다. 마이크와 스피커는 Jetson에 유선으로 연결합니다. [BLE 스케치·배선·실행 안내](docs/ble-imu.md)
+
+```sh
+python3 -m runtime live --ble-address "$UNO_BLE_ADDRESS" --asr-dir /models/whisper-base
+```
+
+**USB 백업 모드:**
 
 [MPU6050·Arduino USB 배선과 펌웨어](docs/wired-imu.md) · [마이크·스피커·로컬 모델 준비](docs/local-dialogue.md) · [개인 안내 음성 팩](device_audio/README.md)
 
@@ -113,7 +121,7 @@
 python3 -m runtime live --port /dev/ttyACM0 --asr-dir /models/whisper-base
 ```
 
-CNN이 후보를 잡으면 안내를 재생하고 답을 듣습니다. 매 턴 새 센서 관측과 음성 전사를 함께 판단해 재질문·도움 요청·종료를 선택하고, 이벤트 처리가 끝나면 감시를 재개합니다. 무응답은 최대 4턴 후 미확인으로 남깁니다. 실제 Discord 알림은 비공개 환경변수 설정 후 `--discord`를 명시해야 활성화됩니다. 무선 모듈은 사용하지 않으며, 실제 보드에서의 종단 간 동작은 아직 확인하지 않았습니다.
+CNN이 후보를 잡으면 안내를 재생하고 답을 듣습니다. 매 턴 새 센서 관측과 음성 전사를 함께 판단해 재질문·도움 요청·종료를 선택하고, 이벤트 처리가 끝나면 감시를 재개합니다. 무응답은 최대 4턴 후 미확인으로 남깁니다. 실제 Discord 알림은 비공개 환경변수 설정 후 `--discord`를 명시해야 활성화됩니다. 실제 UNO·Jetson에서의 종단 간 동작은 아직 확인하지 않았습니다.
 
 ## Discord 도움 요청 알림
 

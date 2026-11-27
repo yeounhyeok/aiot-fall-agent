@@ -118,11 +118,14 @@ class WiredIMU:
         self.armed, self.active = True, False
         self.unlock_at = 0.0
 
+    def _open_transport(self):
+        return _open_port(self.port, self.baudrate)
+
     def __enter__(self):
         if self.thread is not None:
             raise RuntimeError('use a new WiredIMU context')
         self.stream = WindowStream(Checkpoint(self.detector_dir))
-        self.serial = _open_port(self.port, self.baudrate)
+        self.serial = self._open_transport()
         try:
             self.serial.reset_input_buffer()
             self.started = time.monotonic()
@@ -146,11 +149,11 @@ class WiredIMU:
 
     def _check(self):
         if self.error is not None:
-            raise SensorError('wired IMU acquisition failed: ' + str(self.error)) from self.error
+            raise SensorError('IMU acquisition failed: ' + str(self.error)) from self.error
         if self.thread is None or self.stop.is_set():
             raise SensorError('wired IMU is not running')
         if time.monotonic() > (self.started + STARTUP if self.last is None else self.last + STALE):
-            raise SensorError('wired IMU stream is stale')
+            raise SensorError('IMU stream is stale')
 
     def _read(self):
         try:
