@@ -103,6 +103,18 @@
 
 항상 상태 재확인만 고르는 기준선도 444/536(82.8%)입니다. SFT는 이보다 68건을 더 맞혔지만, 직전 질문을 반복해야 하는 19건은 모두 상태 재확인으로 돌렸습니다. 미튜닝 0점은 이 직접 호출 조건에서 지정한 함수 형식을 맞히지 못했다는 뜻입니다. **이 점수는 합성 전사에서의 교사 일치도이지 실사용 낙상 감지 정확도가 아닙니다.** [집계 원본](https://huggingface.co/yeopeter1031/aiot-fall-qwen3.5-2b-lora-r1/resolve/acd4d0a750731a600386d27c3969deb789dc6f1e/evaluation.json)
 
+## Jetson에서 유선 에이전트 실행
+
+[MPU6050·Arduino USB 배선과 펌웨어](docs/wired-imu.md) · [마이크·스피커·로컬 모델 준비](docs/local-dialogue.md) · [개인 안내 음성 팩](device_audio/README.md)
+
+보드에 스케치를 올리고 USB 포트를 확인한 뒤, 안내 WAV와 Whisper를 로컬에 준비하고 프로젝트 GGUF로 `llama-server`를 먼저 실행하세요. 아래 명령은 저장소 루트 기준이며 포트와 모델 경로는 실제 장치에 맞춰 바꿉니다. 실행 중 모델을 내려받지 않습니다.
+
+```sh
+python3 -m runtime live --port /dev/ttyACM0 --asr-dir /models/whisper-base
+```
+
+CNN이 후보를 잡으면 안내를 재생하고 답을 듣습니다. 매 턴 새 센서 관측과 음성 전사를 함께 판단해 재질문·도움 요청·종료를 선택하고, 이벤트 처리가 끝나면 감시를 재개합니다. 무응답은 최대 4턴 후 미확인으로 남깁니다. 실제 Discord 알림은 비공개 환경변수 설정 후 `--discord`를 명시해야 활성화됩니다. 무선 모듈은 사용하지 않으며, 실제 보드에서의 종단 간 동작은 아직 확인하지 않았습니다.
+
 ## Discord 도움 요청 알림
 
 [알림 함수](notifications/discord_alert.py)는 대화 모델의 결정 JSON을 받아 `raise_alert` + `help_requested`이고 `next_prompt`가 `null`일 때만 고정 문구를 보냅니다. 센서 후보·재확인·상황 종료는 전송하지 않습니다. 원음·전사·인용·사용자 정보도 보내지 않습니다. 외부 알림은 선택 사항이며 오프라인에서는 로컬 장치 동작을 우선하세요.
