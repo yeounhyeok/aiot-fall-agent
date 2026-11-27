@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+assets/
+runs/
+data/
+*.xml
+*.zip
+*.npz
+*.pt
+!weights/net_synth_v1.pt

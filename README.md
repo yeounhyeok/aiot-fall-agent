@@ -30,6 +30,10 @@
 
 ### 신호에서 낙상 점수까지
 
+[감지기 재현 안내](detector/README.md) · [MuJoCo 생성 코드](detector/scripts/synth_v1.py) · [CNN 구조와 손실](detector/scripts/train_eval.py) · [학습 진입점](detector/scripts/train_synth.py) · [학습된 가중치](detector/weights/net_synth_v1.pt) · [CPU 재평가 원본](detector/results/replay_cpu.json)
+
+채택 모델 `synth_v1`의 학습 파라미터는 **32,001개**입니다. 기존 가중치로 SisFall 원시 파일부터 다시 평가해 TP 390 / FN 283 / FP 5 / TN 1,517을 재현했습니다.
+
 ```text
 3 × 300  | 가속도 크기(g), 각속도 크기(°/s)/100, 시작 자세 대비 기울기(rad)
     |

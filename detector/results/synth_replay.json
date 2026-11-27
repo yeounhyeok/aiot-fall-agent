@@ -1,0 +1,14 @@
+{
+  "train": {
+    "simulations": 1892,
+    "positive_windows": 2852,
+    "negative_windows": 4716
+  },
+  "val": {
+    "simulations": 472,
+    "positive_windows": 604,
+    "negative_windows": 1284,
+    "tp": 604,
+    "fp": 0
+  }
+}
